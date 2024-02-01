@@ -43,3 +43,8 @@ def show():
                 click.echo(f"ID: {todo.id}, Task: {todo.task}, Deadline: {todo.deadline}\n")
             else:
                 click.echo(f"ID: {todo.id}, Task: {todo.task}")
+
+
+#faire la methode delete
+
+#faire la commande modify
