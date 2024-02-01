@@ -10,8 +10,8 @@ from dataclasses import dataclass
 class Todo:
     id: uuid.UUID
     task: str
+    delete: str
     deadline: datetime = None
-
 
 @click.group()
 def cli():
@@ -46,5 +46,21 @@ def show():
 
 
 #faire la methode delete
+@cli.command()
+@click.option("-d","--delete",prompt="Task to delete",help="The task you want to delete.")
+def delete(delete: str):
+    with open('data/todo.p', 'rb') as f:
+        # faire avec un for
+        donnees = pickle.load(f)
+        if delete in donnees:
+            del donnees[delete]
+            print(f"Donnée '{delete}' supprimée avec succès.")
+        else:
+            print(f"Donnée '{delete}' non trouvée.")
+
+
+
+
+
 
 #faire la commande modify
