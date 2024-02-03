@@ -46,17 +46,36 @@ def show():
 
 
 #faire la methode delete
+
 @cli.command()
-@click.option("-d","--delete",prompt="Task to delete",help="The task you want to delete.")
+@click.option("-d", "--delete", prompt="Task to delete", help="The task you want to delete.")
 def delete(delete: str):
+    """
+        Deletes a specific task from the todo list.
+
+        We can't directely delete a task in the pickle file so we are creating a new list without the task choose by the user and we write the new list above the old pickle file
+        Parameters:
+
+        - delete (str): The task to be deleted.
+        """
+
+    new_todolist = []
+
     with open('data/todo.p', 'rb') as f:
-        # faire avec un for
-        donnees = pickle.load(f)
-        if delete in donnees:
-            del donnees[delete]
-            print(f"Donnée '{delete}' supprimée avec succès.")
-        else:
-            print(f"Donnée '{delete}' non trouvée.")
+        try:
+            while True:
+                todo = pickle.load(f)
+                if todo.task != delete:
+                    new_todolist.append(todo)
+        except EOFError:
+            pass
+
+    with open('data/todo.p', 'wb') as f:
+        for todo in new_todolist:
+            pickle.dump(todo, f)
+
+    click.echo(f"Task '{delete}' deleted successfully.")
+
 
 
 
