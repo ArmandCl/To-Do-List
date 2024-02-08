@@ -10,8 +10,8 @@ from dataclasses import dataclass
 class Todo:
     id: uuid.UUID
     task: str
-    description : str
-    status : bool
+    description: str
+    status: bool
     deadline: datetime
 
 @click.group()
@@ -91,7 +91,43 @@ def search(id: str):
     if found_task is None:
         click.echo("Task not found")
 
+@cli.command()
+@click.option("--id", prompt="Task to modify", help="The task you want to modify.")
+def modify(id :str):
 
+    todos = load_data()
+
+    # ask the user if he wants to change the task name
+    ask_name = click.prompt("Do you want to change the task name? (y/n)", default="n", type=str)
+    if ask_name.lower() == "y":
+        new_name = click.prompt("Enter the new name:", type=str)
+
+    # ask the user if he wants to change the task description
+    ask_description = click.prompt("Do you want to change the task description ? (y/n)", default="n", type=str)
+    if ask_description.lower() == "y":
+        new_description = click.prompt("Enter the new description:", type=str)
+
+    # ask the user if he wants to change the task status
+    ask_status = click.prompt("Do you want to change the task description ? (y/n)", default="n", type=str)
+    if ask_status.lower() == "y":
+        new_status = click.prompt("Enter the new status:", type=bool)
+
+    #ask the user if he wants to change the deadline
+    ask_deadline = click.prompt("Do you want to change the deadline? (y/n)", default="n", type=str)
+    if ask_deadline.lower() == "y":
+        new_deadline = click.prompt("Enter the new deadline (YYYY-MM-DD):", type=click.DateTime(formats=["%Y-%m-%d"]))
+
+    for todo in todos:
+        if todo.id == id:
+            todo.task = new_name
+            todo.description = new_description
+            todo.status = new_status
+            todo.deadline = new_deadline
+
+    with open('data/todo.p', 'wb') as f:
+        for todo in todos:
+            pickle.dump(todo, f)
+    click.echo("Task well modify")
 @cli.command()
 @click.option("--id", prompt="Task to delete", help="The task you want to delete.")
 def delete(id: str):
