@@ -2,7 +2,7 @@ import datetime
 import pickle
 import click
 import uuid
-
+import pandas as pd
 from dataclasses import dataclass
 
 
@@ -112,11 +112,43 @@ def delete(id: str):
 
     click.echo("Task deleted successfully.")
 
+@cli.command()
+def exportcsv():
+    """
+    to export the pickle's file into a csv file, we are going to use Pandas
+    """
+    data = load_data()
+
+    if not data:
+        click.echo("No data to export.")
+        return
+
+    df = pd.DataFrame([vars(todo) for todo in data])
+    df.to_csv('data/todo.csv', index=False)
+    click.echo("Data exported to 'data/todo.csv' successfully.")
+
+@cli.command()
+@click.option("--csv-file", prompt="CSV file path", help="Path to the CSV file to import.")
+@click.option("--pickle-file", prompt="Pickle file path", help="Path to save the converted pickle file.")
+def importcsv(csv_file: str, pickle_file: str):
+    """
+    Import data from a CSV file, convert, and save as a pickle file.
+    """
+    try:
+        # Read data from CSV file into a DataFrame
+        df = pd.read_csv(csv_file)
+
+        # Convert DataFrame to list of Todo objects
+        data = [Todo(**row) for index, row in df.iterrows()]
+
+        # Save data as a pickle file
+        with open(pickle_file, 'wb') as f:
+            pickle.dump(data, f)
+
+        click.echo(f"Data imported and saved as '{pickle_file}' successfully.")
+    except FileNotFoundError:
+        click.echo(f"CSV file '{csv_file}' not found. No data imported.")
+    except Exception as e:
+        click.echo(f"Error during import and pickle conversion: {e}")
 
 
-
-
-
-
-
-#faire la commande modify
