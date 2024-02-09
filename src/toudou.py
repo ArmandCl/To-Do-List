@@ -93,9 +93,22 @@ def search(id: str):
 
 @cli.command()
 @click.option("--id", prompt="Task to modify", help="The task you want to modify.")
-def modify(id :str):
+def modify(id: str):
 
     todos = load_data()
+
+    # Convert id to uuid.UUID
+    try:
+        search_id = uuid.UUID(id)
+    except ValueError:
+        click.echo("Invalid UUID format")
+        return
+
+    # Initialize variables outside of conditional blocks
+    new_name = None
+    new_description = None
+    new_status = None
+    new_deadline = None
 
     # ask the user if he wants to change the task name
     ask_name = click.prompt("Do you want to change the task name? (y/n)", default="n", type=str)
@@ -108,26 +121,33 @@ def modify(id :str):
         new_description = click.prompt("Enter the new description:", type=str)
 
     # ask the user if he wants to change the task status
-    ask_status = click.prompt("Do you want to change the task description ? (y/n)", default="n", type=str)
+    ask_status = click.prompt("Do you want to change the task status ? (y/n)", default="n", type=str)
     if ask_status.lower() == "y":
         new_status = click.prompt("Enter the new status:", type=bool)
 
-    #ask the user if he wants to change the deadline
+    # ask the user if he wants to change the deadline
     ask_deadline = click.prompt("Do you want to change the deadline? (y/n)", default="n", type=str)
     if ask_deadline.lower() == "y":
         new_deadline = click.prompt("Enter the new deadline (YYYY-MM-DD):", type=click.DateTime(formats=["%Y-%m-%d"]))
 
     for todo in todos:
-        if todo.id == id:
-            todo.task = new_name
-            todo.description = new_description
-            todo.status = new_status
-            todo.deadline = new_deadline
+        if todo.id == search_id:
+            # Assign values only if they are not None
+            if new_name is not None:
+                todo.task = new_name
+            if new_description is not None:
+                todo.description = new_description
+            if new_status is not None:
+                todo.status = new_status
+            if new_deadline is not None:
+                todo.deadline = new_deadline
 
     with open('data/todo.p', 'wb') as f:
         for todo in todos:
             pickle.dump(todo, f)
     click.echo("Task well modify")
+
+
 @cli.command()
 @click.option("--id", prompt="Task to delete", help="The task you want to delete.")
 def delete(id: str):
