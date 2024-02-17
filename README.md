@@ -12,7 +12,12 @@ Options:
     --help  Show this message and exit.
 
 Commands:
-    display
+    create
+    get
+    get-all
+    import-csv
+    init-db
+    update
 ```
 
 Course & examples : [https://kathode.neocities.org](https://kathode.neocities.org)
