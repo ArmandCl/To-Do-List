@@ -16,6 +16,11 @@ def cli():
 def init_db():
     models.init_db()
 
+@cli.command()
+def get_tables_names():
+    table_names = models.get_table_names()
+    click.echo(f"Table Names: {table_names}")
+
 
 @cli.command()
 @click.option("-t", "--task", prompt="Your task", help="The task to remember.")
