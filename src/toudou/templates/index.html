@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accueil</title>
+</head>
+<body>
+  <h1 style="text-align: center">Accueil</h1>
+
+  <form method="post">
+    <label for="Task">Name :</label>
+    <input type="text" name="Task" placeholder="Enter your task name" id="Task" required>
+    <br>
+    <label for="Date">Date :</label>
+    <input type="date" name="date" id="Date">
+    <br>
+    <input type="submit" value="Create ticket">
+  </form>
+
+{% if task %}
+  <h1>Task name: {{ task }}</h1>
+{% endif %}
+
+{% if due %}
+  <h1>Deadline: {{ due }}</h1>
+{% endif %}
+
+{% if not task and not due %}
+  <h1>No tickets</h1>
+{% endif %}
+
+{% if message %}
+  <p>{{ message }}</p>
+{% endif %}
+
+</body>
+</html>

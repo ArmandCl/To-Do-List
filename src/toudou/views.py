@@ -5,7 +5,9 @@ from datetime import datetime
 
 import toudou.models as models
 import toudou.services as services
+from flask import render_template, Flask, request
 
+app = Flask(__name__)
 
 @click.group()
 def cli():
@@ -15,11 +17,6 @@ def cli():
 @cli.command()
 def init_db():
     models.init_db()
-
-@cli.command()
-def get_tables_names():
-    table_names = models.get_table_names()
-    click.echo(f"Table Names: {table_names}")
 
 
 @cli.command()
@@ -63,3 +60,30 @@ def update(id: uuid.UUID, complete: bool, task: str, due: datetime):
 @click.option("--id", required=True, type=click.UUID, help="Todo's id.")
 def delete(id: uuid.UUID):
     models.delete_todo(id)
+
+@cli.command()
+def affiche_table():
+    models.display_tables()
+
+@app.route('/')
+@app.route('/', methods=['POST'])
+def accueil():
+    models.init_db()
+    if request.method == 'POST':
+        task = request.form['Task']
+        if request.form['date']:
+            due = datetime.strptime(request.form['date'], "%Y-%m-%d")
+        else:
+            due = None
+
+        app.logger.info(f"Task: {task}, Due: {due}")
+
+        if models.create_todo(task, due=due):
+            message = "Task created successfully"
+        else:
+            message = "Failed to create task"
+
+        return render_template("index.html", task=task, date=due, message=message)
+    else:
+        return render_template('index.html')
+
