@@ -83,7 +83,7 @@ def accueil():
         else:
             message = "Failed to create task"
 
-        return render_template("index.html", task=task, date=due, message=message)
+        return render_template("index.html", task=task, due=due, message=message)
     else:
         return render_template('index.html')
 

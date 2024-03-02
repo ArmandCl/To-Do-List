@@ -18,15 +18,15 @@
   </form>
 
 {% if task %}
-  <h1>Task name: {{ task }}</h1>
+  <h3>Task name: {{ task }}</h3>
 {% endif %}
 
 {% if due %}
-  <h1>Deadline: {{ due }}</h1>
+  <h3>Deadline: {{ due }}</h3>
 {% endif %}
 
 {% if not task and not due %}
-  <h1>No tickets</h1>
+  <h3>No tickets</h3>
 {% endif %}
 
 {% if message %}
