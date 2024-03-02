@@ -148,21 +148,23 @@ def update_todo(
 
 
 
-def delete_todo(id: uuid.UUID) -> None:
-    global metadata, todos_table, engine
+def delete_todo(id_str: str) -> None:
+    global engine, metadata, todos_table
+
+    try:
+        # Convert the string ID to a UUID object
+        id = uuid.UUID(id_str)
+    except ValueError as e:
+        print(f"Error converting {id_str} to UUID: {e}")
+        return
 
     delete_stmt = todos_table.delete().where(todos_table.c.id == id)
 
-    try:
-        with engine.begin() as conn:
-            result = conn.execute(delete_stmt)
-            if result.rowcount > 0:
-                print("Delete successfully ")
-            else:
-                print("Nothing has been deleted")
-    except Exception as e:
-        print(f"Error deleting todo: {e}")
-    finally:
-        conn.close()
+    with engine.begin() as conn:
+        result = conn.execute(delete_stmt)
+        if result.rowcount > 0:
+            print("Delete successfully ")
+        else:
+            print(f"No todo found with ID {id}")
 
 

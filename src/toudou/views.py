@@ -66,24 +66,32 @@ def affiche_table():
     models.display_tables()
 
 @app.route('/')
-@app.route('/', methods=['POST'])
+# Flask route
+@app.route('/', methods=['GET', 'POST'])
 def accueil():
     models.init_db()
+    message = ""
     if request.method == 'POST':
-        task = request.form['Task']
-        if request.form['date']:
-            due = datetime.strptime(request.form['date'], "%Y-%m-%d")
-        else:
-            due = None
+        if 'add_task' in request.form:
+            task = request.form['Task']
+            if request.form['date']:
+                due = datetime.strptime(request.form['date'], "%Y-%m-%d")
+            else:
+                due = None
 
-        app.logger.info(f"Task: {task}, Due: {due}")
+            if models.create_todo(task, due=due):
+                message = "Task created successfully"
+            else:
+                message = "Failed to create task"
 
-        if models.create_todo(task, due=due):
-            message = "Task created successfully"
-        else:
-            message = "Failed to create task"
+        elif 'delete_task' in request.form:
+            id_delete = request.form['id']
+            models.delete_todo(id_delete)
+            message = "Task deleted successfully"
 
-        return render_template("index.html", task=task, due=due, message=message)
-    else:
-        return render_template('index.html')
+    # Collect tasks after either adding or deleting
+    tasks = models.get_all_todos()
+
+    return render_template("index.html", tasks=tasks, message=message)
+
 
