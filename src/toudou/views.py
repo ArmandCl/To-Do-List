@@ -88,6 +88,26 @@ def accueil():
             id_delete = request.form['id']
             models.delete_todo(id_delete)
             message = "Task deleted successfully"
+        elif 'update_task' in request.form:
+            id_update = request.form['id']
+
+            if 'task' in request.form:
+                new_task = request.form['task']
+            else:
+                new_task = models.get_todo(id_update).task
+
+            if 'complete' in request.form:
+                new_complete = request.form['complete']
+            else:
+                new_complete = models.get_todo(id_update).complete
+
+            if 'date' in request.form:
+                new_due = datetime.strptime(request.form['date'], "%Y-%m-%d")
+            else:
+                new_due = models.get_todo(id_update).due
+
+            models.update_todo(id_update, new_task, new_complete, new_due)
+            message = "Task updated successfully"
 
     # Collect tasks after either adding or deleting
     tasks = models.get_all_todos()
