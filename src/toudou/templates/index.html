@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="../static/index.css">
     <title>Accueil</title>
 </head>
 <body>
-  <h1 style="text-align: center">Accueil</h1>
+<div class="left">
 
     <!-- Add task form -->
     <h2>Add a task</h2>
@@ -46,38 +47,47 @@
         <input type="submit" name="update_task" value="Update task">
     </form>
 
-
 {% if message %}
-  <p>{{ message }}</p>
+    <p><strong>{{ message }}</strong></p>
 {% endif %}
+</div>
+
+
 <hr>
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Task</th>
-            <th>Deadline</th>
-            <th>Complete</th>
-        </tr>
-    </thead>
 
-    <tbody>
-        {% for task in tasks %}
+
+
+<div class="right">
+    <h2>Tasks</h2>
+    <table>
+
+        <thead>
             <tr>
-                <td>{{ task.id }}</td>
-                <td>{{ task.task }}</td>
-                <td>{{ task.due }}</td>
-                <td>{{ task.complete }}</td>
+                <th>ID</th>
+                <th>Task</th>
+                <th>Deadline</th>
+                <th>Complete</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
 
-<form>
-    <input name="export_csv" type="submit" value="Export to CSV">
-    <input name="import_csv" type="submit" value="Import a CSV">
-</form>
+        <tbody>
+            {% for task in tasks %}
+                <tr>
+                    <td>{{ task.id }}</td>
+                    <td>{{ task.task }}</td>
+                    <td>{{ task.due }}</td>
+                    <td>{{ task.complete }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
 
+    </table>
+
+    <form>
+        <input name="export_csv" type="submit" value="Export to CSV">
+        <input name="import_csv" type="submit" value="Import a CSV">
+    </form>
+</div>
 
 </body>
 </html>

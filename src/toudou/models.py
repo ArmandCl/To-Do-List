@@ -131,6 +131,8 @@ def update_todo(
     complete: bool,
     due: datetime | None
 ) -> None:
+    global engine, metadata, todos_table
+
     update_stmt = todos_table.update().where(todos_table.c.id == id).values(
         task=task,
         complete=complete,
