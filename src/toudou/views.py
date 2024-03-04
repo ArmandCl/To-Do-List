@@ -5,7 +5,7 @@ from datetime import datetime
 
 import toudou.models as models
 import toudou.services as services
-from flask import render_template, Flask, request
+from flask import render_template, Flask, request,Response
 
 app = Flask(__name__)
 
@@ -89,22 +89,23 @@ def accueil():
             models.delete_todo(id_delete)
             message = "Task deleted successfully"
         elif 'update_task' in request.form:
-            id_update = request.form['id']
+            id_update = uuid.UUID(request.form['id'])
+            todo_to_update = models.get_todo(id_update)
 
-            if 'task' in request.form:
-                new_task = request.form['task']
+            if 'Task' in request.form:
+                new_task = request.form['Task']
             else:
-                new_task = models.get_todo(id_update).task
+                new_task = todo_to_update.task
 
-            if 'complete' in request.form:
-                new_complete = request.form['complete']
+            if 'Complete' not in request.form and request.form.get('Complete') == '':
+                new_complete = todo_to_update.complete
             else:
-                new_complete = models.get_todo(id_update).complete
+                new_complete = request.form.get('Complete', 'False') == 'on'
 
-            if 'date' in request.form:
-                new_due = datetime.strptime(request.form['date'], "%Y-%m-%d")
+            if 'Date' not in request.form and request.form.get('Date') == '':
+                new_due = todo_to_update.due
             else:
-                new_due = models.get_todo(id_update).due
+                new_due = datetime.strptime(request.form['Date'], "%Y-%m-%d")
 
             models.update_todo(id_update, new_task, new_complete, new_due)
             message = "Task updated successfully"

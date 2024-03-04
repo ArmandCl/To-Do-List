@@ -77,7 +77,7 @@ def get_todo(id: uuid.UUID) -> Todo:
     global engine, metadata, todos_table
 
     # Sélectionne toutes les colonnes de la table todos où l'ID correspond
-    stmt = select([todos_table]).where(todos_table.c.id == id)
+    stmt = select(todos_table).where(todos_table.c.id == id)
 
     with engine.connect() as conn:
         result = conn.execute(stmt)
@@ -131,8 +131,6 @@ def update_todo(
     complete: bool,
     due: datetime | None
 ) -> None:
-    global engine, metadata, todos_table
-
     update_stmt = todos_table.update().where(todos_table.c.id == id).values(
         task=task,
         complete=complete,
@@ -145,6 +143,7 @@ def update_todo(
             print("Update successfully ")
         else:
             print(f"No todo found with ID {id}")
+
 
 
 

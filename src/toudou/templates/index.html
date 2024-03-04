@@ -35,13 +35,13 @@
         <input type="text" name="id" placeholder="Enter your task ID" id="id" required>
         <br>
         <label for="Task">Name :</label>
-        <input type="text" name="Task" placeholder="Enter your task name" id="Task" required>
+        <input type="text" name="Task" placeholder="Enter your task name" id="Task">
         <br>
         <label for="Date">Date :</label>
-        <input type="date" name="date" id="Date">
+        <input type="date" name="Date" id="Date">
         <br>
         <label for="Complete">Complete :</label>
-        <input type="checkbox" name="complete" id="Complete">
+        <input type="checkbox" name="Complete" id="Complete">
         <br>
         <input type="submit" name="update_task" value="Update task">
     </form>
@@ -72,6 +72,12 @@
         {% endfor %}
     </tbody>
 </table>
+
+<form>
+    <input name="export_csv" type="submit" value="Export to CSV">
+    <input name="import_csv" type="submit" value="Import a CSV">
+</form>
+
 
 </body>
 </html>
