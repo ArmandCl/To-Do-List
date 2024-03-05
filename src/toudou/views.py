@@ -36,7 +36,7 @@ def get(id: uuid.UUID):
 @click.option("--as-csv", is_flag=True, help="Ouput a CSV string.")
 def get_all(as_csv: bool):
     if as_csv:
-        click.echo(services.export_to_csv().getvalue())
+        click.echo(services.export_to_csv())
     else:
         click.echo(models.get_all_todos())
 
@@ -93,8 +93,8 @@ def update_task():
         id_update = uuid.UUID(request.form['id'])
         todo_to_update = models.get_todo(id_update)
 
-        new_task = request.form['Task'] if 'Task' in request.form else todo_to_update.task
-        new_complete = request.form.get('Complete', 'False') == 'on' if 'Complete' in request.form else todo_to_update.complete
+        new_task = todo_to_update.task if request.form['Task'] == "" else request.form['Task']
+        new_complete = request.form.get('Complete', 'False') == 'on'
         new_due = datetime.strptime(request.form['Date'], "%Y-%m-%d") if 'Date' in request.form and request.form.get('Date') else todo_to_update.due
 
         models.update_todo(id_update, new_task, new_complete, new_due)
@@ -114,4 +114,17 @@ def delete_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message)
 
+@app.route('/exportcsv', methods=['POST'])
+def export_csv():
 
+    tasks = models.get_all_todos()
+    export = services.export_to_csv()
+    if export == 0:
+        message = "Export successful. Data written to /db/db.csv"
+    else:
+        message = "No data to export !"
+    return render_template("index.html", tasks=tasks, message=message)
+
+@app.route('/importcsv', methods=['POST'])
+def import_csv():
+    pass

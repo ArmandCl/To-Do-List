@@ -7,15 +7,26 @@ from datetime import datetime
 from toudou.models import create_todo, get_all_todos, Todo
 
 
-def export_to_csv() -> io.StringIO:
-    output = io.StringIO()
-    csv_writer = csv.DictWriter(
-        output,
-        fieldnames=[f.name for f in dataclasses.fields(Todo)]
-    )
-    for todo in get_all_todos():
-        csv_writer.writerow(dataclasses.asdict(todo))
-    return output
+def export_to_csv() -> None:
+    # Utilise la méthode get_all_todos pour récupérer les tâches
+    todos = get_all_todos()
+    filename = "./db/db.csv"
+    if todos:
+        # Écrire les données dans un fichier CSV
+        csv_columns = ["id", "task", "complete", "due"]
+        with open(filename, 'w', newline='') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=csv_columns)
+            writer.writeheader()
+            for todo in todos:
+                writer.writerow({
+                    "id": str(todo.id),
+                    "task": todo.task,
+                    "complete": str(todo.complete),
+                    "due": todo.due.isoformat() if todo.due else None
+                })
+        return 0 #succes
+    else:
+        return 1 #error
 
 
 def import_from_csv(csv_file: io.StringIO) -> None:
