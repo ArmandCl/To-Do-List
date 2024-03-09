@@ -155,7 +155,7 @@ def import_csv():
     elif import_result == 2:
         message = "Error reading the CSV file."
     else:
-        message = "An unspecified error occurred during import."
+        message = "An unspecified error occurred during import. (It's probably due to the date !)"
 
     # Use the list of tasks before import if an error occurred
     tasks = tasks_after_import if import_result == 0 else tasks_before_import
