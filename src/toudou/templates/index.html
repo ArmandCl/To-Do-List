@@ -87,9 +87,11 @@
         <input name="export_csv" type="submit" value="Export to CSV">
     </form>
 
-    <form method="post" action="/importcsv">
-        <input name="import_csv" type="submit" value="Import a CSV">
+    <form method="post" action="/importcsv" enctype="multipart/form-data">
+        <input type="file" name="csv_file">
+        <button type="submit">Import CSV</button>
     </form>
+
 </div>
 
 </body>

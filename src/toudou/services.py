@@ -3,11 +3,12 @@ import dataclasses
 import io
 
 from datetime import datetime
+from pandas import pd
 
 from toudou.models import create_todo, get_all_todos, Todo
 
 
-def export_to_csv() -> None:
+def export_to_csv() -> int:
     # Utilise la méthode get_all_todos pour récupérer les tâches
     todos = get_all_todos()
     filename = "./db/db.csv"
@@ -29,14 +30,26 @@ def export_to_csv() -> None:
         return 1 #error
 
 
-def import_from_csv(csv_file: io.StringIO) -> None:
-    csv_reader = csv.DictReader(
-        csv_file,
-        fieldnames=[f.name for f in dataclasses.fields(Todo)]
-    )
-    for row in csv_reader:
-        create_todo(
-            task=row["task"],
-            due=datetime.fromisoformat(row["due"]) if row["due"] else None,
-            complete=row["complete"] == "True"
-        )
+def import_from_csv(csv_file) -> int:
+    try:
+        # Lecture du fichier CSV avec pandas
+        df = pd.read_csv(csv_file)
+
+        for index, row in df.iterrows():
+            task = row['task']
+            due_temp = row['due']
+            due = datetime.strptime(due_temp, '%Y-%m-%d %H:%M:%S') if pd.notna(due_temp) else None
+            complete = bool(row['complete'])
+
+            if due:
+                create_todo(task, due=due, complete=complete)
+            else:
+                create_todo(task, complete=complete)
+
+        return 0  # Succès
+    except pd.errors.EmptyDataError:
+        return 1  # Le fichier CSV est vide
+    except pd.errors.ParserError:
+        return 2  # Erreur lors de la lecture du fichier CSV
+    except Exception as e:
+        return 3  # Autre erreur non spécifiée

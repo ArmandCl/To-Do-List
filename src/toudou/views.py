@@ -127,4 +127,31 @@ def export_csv():
 
 @app.route('/importcsv', methods=['POST'])
 def import_csv():
-    pass
+    # Vérifier si un fichier CSV a été inclus dans la requête
+    if 'csv_file' not in request.files:
+        message = "No CSV file provided."
+        return render_template("index.html", tasks=[], message=message)
+
+    csv_file = request.files['csv_file']
+
+    # Vérifier si le fichier a un nom et une extension appropriés
+    if csv_file.filename == '' or not csv_file.filename.endswith('.csv'):
+        message = "Invalid CSV file."
+        return render_template("index.html", tasks=[], message=message)
+
+    # Appeler la fonction d'import avec le fichier CSV
+    import_result = services.import_from_csv(csv_file)
+
+    # Récupérer la liste des tâches après l'import
+    tasks = models.get_all_todos()
+
+    if import_result == 0:
+        message = "Import successful."
+    elif import_result == 1:
+        message = "No data imported. The CSV file is empty."
+    elif import_result == 2:
+        message = "Error reading the CSV file."
+    else:
+        message = "An unspecified error occurred during import."
+
+    return render_template("index.html", tasks=tasks, message=message)

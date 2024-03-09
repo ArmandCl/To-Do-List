@@ -59,7 +59,7 @@ def create_todo(
         task: str,
         complete: bool = False,
         due: datetime | None = None
-) -> None:
+) -> int:
     global engine, metadata, todos_table
 
     stmt = todos_table.insert().values(
