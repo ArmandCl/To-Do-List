@@ -127,23 +127,26 @@ def export_csv():
 
 @app.route('/importcsv', methods=['POST'])
 def import_csv():
-    # Vérifier si un fichier CSV a été inclus dans la requête
+    # Get the list of tasks before import
+    tasks_before_import = models.get_all_todos()
+
+    # Check if a CSV file has been provided in the request
     if 'csv_file' not in request.files:
         message = "No CSV file provided."
-        return render_template("index.html", tasks=[], message=message)
+        return render_template("index.html", tasks=tasks_before_import, message=message)
 
     csv_file = request.files['csv_file']
 
-    # Vérifier si le fichier a un nom et une extension appropriés
+    # Check if the file has a proper name and extension
     if csv_file.filename == '' or not csv_file.filename.endswith('.csv'):
         message = "Invalid CSV file."
-        return render_template("index.html", tasks=[], message=message)
+        return render_template("index.html", tasks=tasks_before_import, message=message)
 
-    # Appeler la fonction d'import avec le fichier CSV
+    # Call the import function with the CSV file
     import_result = services.import_from_csv(csv_file)
 
-    # Récupérer la liste des tâches après l'import
-    tasks = models.get_all_todos()
+    # Get the list of tasks after import
+    tasks_after_import = models.get_all_todos()
 
     if import_result == 0:
         message = "Import successful."
@@ -154,4 +157,8 @@ def import_csv():
     else:
         message = "An unspecified error occurred during import."
 
+    # Use the list of tasks before import if an error occurred
+    tasks = tasks_after_import if import_result == 0 else tasks_before_import
+
     return render_template("index.html", tasks=tasks, message=message)
+
