@@ -5,13 +5,14 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 from typing import List
+from toudou import config
 
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, Integer, String, Boolean, DateTime, engine, Engine, \
     inspect, select, insert, bindparam,delete
 
 TODO_FOLDER = "db"
 metadata = MetaData()
-engine = create_engine(f'sqlite:///{TODO_FOLDER}/todos.bd', echo=True)
+engine = create_engine(config["DATABASE_URL"], echo=config["DEBUG"])
 todos_table = Table(
         "todos",
         metadata,

@@ -16,8 +16,11 @@ license = { text = "MIT" }
 [project.scripts]
 toudou = "toudou.views:cli"
 
-
 [build-system]
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
+[tool.pdm.scripts]
+_.env_file = "dev.env"
+start.env_file = "dev.env"
+start.cmd = "flask --app toudou.views --debug run"

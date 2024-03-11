@@ -161,4 +161,3 @@ def import_csv():
     tasks = tasks_after_import if import_result == 0 else tasks_before_import
 
     return render_template("index.html", tasks=tasks, message=message)
-
