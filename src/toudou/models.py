@@ -10,7 +10,7 @@ from toudou import config
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, Integer, String, Boolean, DateTime, engine, Engine, \
     inspect, select, insert, bindparam,delete
 
-TODO_FOLDER = "db"
+TODO_FOLDER = config["TODO_FOLDER"]
 metadata = MetaData()
 engine = create_engine(config["DATABASE_URL"], echo=config["DEBUG"])
 todos_table = Table(

@@ -6,12 +6,13 @@ from datetime import datetime
 
 import pandas as pd
 from toudou.models import create_todo, get_all_todos, Todo
+from toudou import config
 
 
 def export_to_csv() -> int:
     # Utilise la méthode get_all_todos pour récupérer les tâches
     todos = get_all_todos()
-    filename = "./db/db.csv"
+    filename = config["FILE_NAME_CSV"]
     if todos:
         # Écrire les données dans un fichier CSV
         csv_columns = ["id", "task", "complete", "due"]
@@ -38,7 +39,6 @@ def import_from_csv(csv_file) -> int:
         for index, row in df.iterrows():
             task = row['task']
             due_temp = row['due']
-            #due = datetime.strptime(due_temp, '%Y-%m-%d %H:%M:%S') if pd.notna(due_temp) else None
             due = pd.to_datetime(due_temp, errors='coerce').to_pydatetime() if pd.notna(due_temp) else None
             complete = bool(row['complete'])
 
