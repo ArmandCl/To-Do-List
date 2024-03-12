@@ -5,9 +5,8 @@ from datetime import datetime
 
 import toudou.models as models
 import toudou.services as services
-from flask import render_template, Flask, request,Response
+from flask import render_template, Flask, request,Response, Blueprint
 
-app = Flask(__name__)
 
 @click.group()
 def cli():
@@ -65,13 +64,27 @@ def delete(id: uuid.UUID):
 def affiche_table():
     models.display_tables()
 
-@app.route('/')
+
+
+
+
+
+
+
+web_ui =Blueprint("web_ui",__name__, url_prefix="/")
+
+def create_app():
+    app = Flask(__name__)
+    from toudou.views import web_ui
+    app.register_blueprint(web_ui)
+    return app
+@web_ui.route('/')
 def accueil():
     models.init_db()
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks)
 
-@app.route('/insert', methods=['POST'])
+@web_ui.route('/insert', methods=['POST'])
 def insert_task():
     message = ""
     if request.method == 'POST':
@@ -86,7 +99,7 @@ def insert_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message)
 
-@app.route('/update', methods=['POST'])
+@web_ui.route('/update', methods=['POST'])
 def update_task():
     message = ""
     if request.method == 'POST':
@@ -103,7 +116,7 @@ def update_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message)
 
-@app.route('/delete', methods=['POST'])
+@web_ui.route('/delete', methods=['POST'])
 def delete_task():
     message = ""
     if request.method == 'POST':
@@ -114,7 +127,7 @@ def delete_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message)
 
-@app.route('/exportcsv', methods=['POST'])
+@web_ui.route('/exportcsv', methods=['POST'])
 def export_csv():
 
     tasks = models.get_all_todos()
@@ -125,7 +138,7 @@ def export_csv():
         message = "No data to export !"
     return render_template("index.html", tasks=tasks, message=message)
 
-@app.route('/importcsv', methods=['POST'])
+@web_ui.route('/importcsv', methods=['POST'])
 def import_csv():
     # Get the list of tasks before import
     tasks_before_import = models.get_all_todos()

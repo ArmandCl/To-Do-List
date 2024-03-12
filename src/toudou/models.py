@@ -10,7 +10,7 @@ from toudou import config
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, Integer, String, Boolean, DateTime, engine, Engine, \
     inspect, select, insert, bindparam,delete
 
-TODO_FOLDER = config["TODO_FOLDER"]
+TODO_FOLDER = config["TOUDOU_FOLDER"]
 metadata = MetaData()
 engine = create_engine(config["DATABASE_URL"], echo=config["DEBUG"])
 todos_table = Table(
@@ -168,5 +168,3 @@ def delete_todo(id_str: str) -> None:
             print("Delete successfully ")
         else:
             print(f"No todo found with ID {id}")
-
-
