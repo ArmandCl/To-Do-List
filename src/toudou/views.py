@@ -1,3 +1,5 @@
+import logging
+
 import click
 import uuid
 
@@ -86,6 +88,7 @@ def accueil():
 
 @web_ui.route('/insert', methods=['POST'])
 def insert_task():
+    abort(500)
     message = ""
     if request.method == 'POST':
         task = request.form['Task']
@@ -101,6 +104,7 @@ def insert_task():
 
 @web_ui.route('/update', methods=['POST'])
 def update_task():
+    abort(404)
     message = ""
     if request.method == 'POST':
         id_update = uuid.UUID(request.form['id'])
@@ -177,8 +181,10 @@ def import_csv():
 
 @web_ui.errorhandler(500)
 def handle_internal_error(error):
+    logging.exception(error)
     return redirect(url_for(".accueil"))
 
 @web_ui.errorhandler(404)
 def handle_internal_error(error):
+    logging.exception(error)
     return redirect(url_for(".accueil"))
