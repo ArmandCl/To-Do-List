@@ -114,6 +114,16 @@ def delete_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message)
 
+@app.route('/delete_all', methods=['POST'])
+def delete_all():
+    message = ""
+    if request.method == 'POST':
+        models.delete_all()
+        message = "All the tasks have been delete successfully"
+
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, message=message)
+
 @app.route('/exportcsv', methods=['POST'])
 def export_csv():
 

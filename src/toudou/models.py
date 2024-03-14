@@ -169,4 +169,18 @@ def delete_todo(id_str: str) -> None:
         else:
             print(f"No todo found with ID {id}")
 
+def delete_all():
+    global engine, todos_table
+
+    # Créer une instruction DELETE pour supprimer tous les todos
+    delete_stmt = todos_table.delete()
+
+    with engine.begin() as conn:
+        result = conn.execute(delete_stmt)
+        if result.rowcount > 0:
+            print("Delete successfully ")
+        else:
+            print("No todos found to delete")
+
+
 
