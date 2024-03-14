@@ -5,7 +5,7 @@ from datetime import datetime
 
 import toudou.models as models
 import toudou.services as services
-from flask import render_template, Flask, request,Response, Blueprint
+from flask import render_template, Flask, request,Response, Blueprint, flash, redirect, url_for, abort
 
 
 @click.group()
@@ -174,3 +174,11 @@ def import_csv():
     tasks = tasks_after_import if import_result == 0 else tasks_before_import
 
     return render_template("index.html", tasks=tasks, message=message)
+
+@web_ui.errorhandler(500)
+def handle_internal_error(error):
+    return redirect(url_for(".accueil"))
+
+@web_ui.errorhandler(404)
+def handle_internal_error(error):
+    return redirect(url_for(".accueil"))
