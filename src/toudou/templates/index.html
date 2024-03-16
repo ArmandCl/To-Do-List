@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="../static/index.css">
+    <link rel="stylesheet" href="../static/css/index.css">
     <title>Accueil</title>
 </head>
 <body>
@@ -24,7 +24,7 @@
     <h2>Delete a task</h2>
     <form method="post" action="/delete">
       <label for="ID">ID :</label>
-      <input type="text" name="id" placeholder="Enter your task ID" id="id" required>
+      <input type="text" name="id" placeholder="Enter your task ID" id="ID_delete" required>
       <br>
       <input type="submit" name="delete_task" value="Delete task">
     </form>
@@ -33,7 +33,7 @@
     <h2>Update a task</h2>
     <form method="post" action="/update">
         <label for="ID">ID :</label>
-        <input type="text" name="id" placeholder="Enter your task ID" id="id" required>
+        <input type="text" name="id" placeholder="Enter your task ID" id="ID_update" required>
         <br>
         <label for="Task">Name :</label>
         <input type="text" name="Task" placeholder="Enter your task name" id="Task">
@@ -45,6 +45,10 @@
         <input type="checkbox" name="Complete" id="Complete">
         <br>
         <input type="submit" name="update_task" value="Update task">
+    </form>
+
+    <form method="post" action="/delete_all">
+        <input name="delete_all" type="submit" value="Delete all">
     </form>
 
 {% if message %}
@@ -67,6 +71,7 @@
                 <th>Task</th>
                 <th>Deadline</th>
                 <th>Complete</th>
+                <th>Select a task</th>
             </tr>
         </thead>
 
@@ -77,15 +82,13 @@
                     <td>{{ task.task }}</td>
                     <td>{{ task.due }}</td>
                     <td>{{ task.complete }}</td>
+                    <td><input type="checkbox" name="Select_task" class="select-checkbox" data-task-id="{{ task.id }}"></td>
                 </tr>
             {% endfor %}
         </tbody>
 
     </table>
 
-    <form method="post" action="/delete_all">
-        <input name="delete_all" type="submit" value="Delete all">
-    </form>
 
     <form method="post" action="/exportcsv">
         <input name="export_csv" type="submit" value="Export to CSV">
@@ -99,6 +102,6 @@
     </form>
 
 </div>
-
+<script src="../static/js/script.js"></script>
 </body>
 </html>
