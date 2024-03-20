@@ -173,6 +173,18 @@ def delete_task():
     tasks = models.get_all_todos()
     return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form)
 
+@web_ui.route('/delete_all', methods=['POST'])
+def delete_all():
+    message = ""
+    update_form = UpdateTodoForm()
+    insert_form = InsertTodoForm()
+    if request.method == 'POST':
+        models.delete_all()
+        message = "All the tasks have been delete successfully"
+
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form)
+
 @web_ui.route('/exportcsv', methods=["GET", "POST"])
 def export_csv():
 
