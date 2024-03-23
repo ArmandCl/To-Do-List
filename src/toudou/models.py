@@ -10,6 +10,9 @@ from toudou import config
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, Integer, String, Boolean, DateTime, engine, Engine, \
     inspect, select, insert, bindparam,delete
 
+from werkzeug.security import generate_password_hash
+
+
 TODO_FOLDER = config["TOUDOU_FOLDER"]
 metadata = MetaData()
 engine = create_engine(config["DATABASE_URL"], echo=config["DEBUG"])
@@ -22,6 +25,15 @@ todos_table = Table(
         Column("due", DateTime, nullable=True)
     )
 
+users_table = Table(
+    "users",
+    metadata,
+    Column("id_user", Uuid, primary_key=True, default=uuid.uuid4),
+    Column("username", String, nullable=False),
+    Column("password", String, nullable=False),
+    Column("role", String, nullable=False)
+)
+
 @dataclass
 class Todo:
     id: uuid.UUID
@@ -29,9 +41,15 @@ class Todo:
     complete: bool
     due: datetime | None
 
+@dataclass
+class User:
+    id_user : uuid.UUID
+    username: str
+    password: str
+    role: str
 
 def init_db() -> None:
-    global metadata, engine, todos_table
+    global metadata, engine, todos_table, users_table
     os.makedirs(TODO_FOLDER, exist_ok=True)
 
     metadata.create_all(engine)
@@ -180,3 +198,64 @@ def delete_all():
             print("Delete successfully ")
         else:
             print("No todos found to delete")
+
+
+def create_user(username: str, password: str, role:str) -> int:
+    global engine, metadata, users_table
+
+    hashed_password = generate_password_hash(password)
+
+    stmt = users_table.insert().values(
+        id=uuid.uuid4(),
+        username=username,
+        password=hashed_password,
+        role=role
+    )
+
+    with engine.begin() as conn:
+        result = conn.execute(stmt)
+        return result.rowcount > 0
+
+def get_user(id : Uuid) -> User:
+    global engine, metadata, users_table
+
+    # Sélectionne toutes les colonnes de la table user où l'ID correspond
+    stmt = select(users_table).where(users_table.c.id_user == id)
+
+    with engine.connect() as conn:
+        result = conn.execute(stmt)
+        user_row = result.fetchone()  # Récupère la première ligne correspondante
+
+    if user_row is not None:
+        # Construit un objet User à partir des valeurs de la ligne récupérée
+        user = User(
+            id_user=user_row[0],
+            username=user_row[1],
+            password=user_row[2],
+            role=user_row[3]
+        )
+        return user
+    else:
+        raise ValueError(f"No user found with ID {id}")
+
+def get_user_by_username(username: str) -> User | None:
+    global engine, metadata, users_table
+
+    # Sélectionne toutes les colonnes de la table user où le nom d'utilisateur correspond
+    stmt = select(users_table).where(users_table.c.username == username)
+
+    with engine.connect() as conn:
+        result = conn.execute(stmt)
+        user_row = result.fetchone()  # Récupère la première ligne correspondante
+
+    if user_row is not None:
+        # Construit un objet User à partir des valeurs de la ligne récupérée
+        user = User(
+            id_user=user_row[0],
+            username=user_row[1],
+            password=user_row[2],
+            role=user_row[3]
+        )
+        return user
+    else:
+        return None

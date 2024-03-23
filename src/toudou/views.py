@@ -75,6 +75,18 @@ def delete(id: uuid.UUID):
 def affiche_table():
     models.display_tables()
 
+@cli.command()
+@click.option("-u", "--username",required=True, prompt="Your username")
+@click.option("-p", "--password",required=True, prompt="Your password")
+@click.option("--role", default="member")
+def create_user(username: str, password: str, role:str):
+    models.create_user(username,password,role)
+
+@cli.command()
+@click.option("--id", required=True, type=click.UUID, help="User's id.")
+def get_user(id: uuid.UUID):
+    models.get_user(id)
+
 
 
 
@@ -84,11 +96,6 @@ def affiche_table():
 
 web_ui =Blueprint("web_ui",__name__, url_prefix="/")
 auth = HTTPBasicAuth()
-
-users = {
-    "armand": generate_password_hash("hello"),
-    "admin": generate_password_hash("admin")
-}
 
 
 class InsertTodoForm(FlaskForm):
@@ -254,8 +261,9 @@ def handle_internal_error(error):
 
 @auth.verify_password
 def verify_password(username, password):
-    if username in users and check_password_hash(users.get(username), password):
-        return username
+    user = models.get_user_by_username(username)
+    if user and check_password_hash(user.password, password):
+        return user
 
 @auth.get_user_roles
 def get_user_roles(user):
