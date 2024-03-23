@@ -12,6 +12,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import generate_password_hash,check_password_hash
 
 import os
 
@@ -81,6 +83,12 @@ def affiche_table():
 
 
 web_ui =Blueprint("web_ui",__name__, url_prefix="/")
+auth = HTTPBasicAuth()
+
+users = {
+    "armand": generate_password_hash("hello"),
+    "admin": generate_password_hash("admin")
+}
 
 
 class InsertTodoForm(FlaskForm):
@@ -107,6 +115,7 @@ def create_app():
 
 
 @web_ui.route('/')
+@auth.login_required()
 def accueil():
     models.init_db()
 
@@ -242,3 +251,17 @@ def handle_internal_error(error):
 def handle_internal_error(error):
     logging.exception(error)
     return redirect(url_for(".accueil"))
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and check_password_hash(users.get(username), password):
+        return username
+
+@auth.get_user_roles
+def get_user_roles(user):
+    return user.roles
+
+@web_ui.route("/admin")
+@auth.login_required(role="admin")
+def admin_view():
+    return f"Hello {auth.current_user()},you are an admin!"
