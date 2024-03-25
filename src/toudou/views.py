@@ -293,6 +293,11 @@ def handle_internal_error(error):
     logging.exception(error)
     return redirect(url_for(".accueil"))
 
+@web_ui.errorhandler(403)
+def handle_internal_error(error):
+    logging.exception(error)
+    return redirect(url_for(".accueil"))
+
 @auth.verify_password
 def verify_password(username, password):
     if username in users and check_password_hash(users.get(username), password):
