@@ -145,94 +145,86 @@ def accueil():
 
 
 @web_ui.route('/insert', methods=["GET", "POST"])
-@auth.login_required()
+@auth.login_required(role="admin")
 def insert_task():
     insert_form = InsertTodoForm()
     update_form = UpdateTodoForm()
     delete_form = DeleteTodoForm()
     message = ""
-    if auth.current_user() in roles["admin"]:
-        if insert_form.validate_on_submit():
-            task = insert_form.insert_task.data
-            due = datetime.strptime(insert_form.insert_date.data, "%Y-%m-%d") if insert_form.insert_date.data else None
 
-            if models.create_todo(task, due=due):
-                message = "Task created successfully"
-                insert_form = InsertTodoForm()
-            else:
-                message = "Failed to create task"
+    if insert_form.validate_on_submit():
+        task = insert_form.insert_task.data
+        due = datetime.strptime(insert_form.insert_date.data, "%Y-%m-%d") if insert_form.insert_date.data else None
 
-        tasks = models.get_all_todos()
-        return render_template("index.html", tasks=tasks, insert_form=insert_form, update_form=update_form, delete_form=delete_form)
-    else:
-        abort(403)
+        if models.create_todo(task, due=due):
+            message = "Task created successfully"
+            insert_form = InsertTodoForm()
+        else:
+            message = "Failed to create task"
+
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, insert_form=insert_form, update_form=update_form, delete_form=delete_form)
+
 
 
 @web_ui.route('/update', methods=["GET", "POST"])
-@auth.login_required()
+@auth.login_required(role="admin")
 def update_task():
     message = ""
     insert_form = InsertTodoForm()
     update_form = UpdateTodoForm()
     delete_form = DeleteTodoForm()
-    if auth.current_user() in roles["admin"]:
-        if update_form.validate_on_submit():
-            id_update = uuid.UUID(update_form.ID_update.data)
-            todo_to_update = models.get_todo(id_update)
 
-            new_task = todo_to_update.task if update_form.update_task.data == "" else update_form.update_task.data
-            new_complete = update_form.complete.data
-            new_due = datetime.strptime(update_form.update_date.data, "%Y-%m-%d") if update_form.update_date.data else todo_to_update.due
+    if update_form.validate_on_submit():
+        id_update = uuid.UUID(update_form.ID_update.data)
+        todo_to_update = models.get_todo(id_update)
 
-            models.update_todo(id_update, new_task, new_complete, new_due)
-            message = "Task updated successfully"
-            update_form = UpdateTodoForm()
-        else :
-            message = "Failed to update the task"
+        new_task = todo_to_update.task if update_form.update_task.data == "" else update_form.update_task.data
+        new_complete = update_form.complete.data
+        new_due = datetime.strptime(update_form.update_date.data, "%Y-%m-%d") if update_form.update_date.data else todo_to_update.due
 
-        tasks = models.get_all_todos()
-        return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form, update_form=update_form, delete_form=delete_form)
-    else:
-        abort(403)
+        models.update_todo(id_update, new_task, new_complete, new_due)
+        message = "Task updated successfully"
+        update_form = UpdateTodoForm()
+    else :
+        message = "Failed to update the task"
+
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form, update_form=update_form, delete_form=delete_form)
 
 @web_ui.route('/delete', methods=["GET", "POST"])
-@auth.login_required()
+@auth.login_required(role="admin")
 def delete_task():
     message = ""
     update_form = UpdateTodoForm()
     insert_form = InsertTodoForm()
     delete_form = DeleteTodoForm()
-    if auth.current_user() in roles["admin"]:
-        #print(uuid.UUID(delete_form.ID_delete.data))
-        if delete_form.validate_on_submit():
-            id_delete = delete_form.ID_delete.data
-            models.delete_todo(id_delete)
-            message = "Task deleted successfully"
-        else:
-            message = "Failed to delete the task"
-        tasks = models.get_all_todos()
-        return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,
-                               update_form=update_form, delete_form=delete_form)
+
+    if delete_form.validate_on_submit():
+        id_delete = delete_form.ID_delete.data
+        models.delete_todo(id_delete)
+        message = "Task deleted successfully"
     else:
-        abort(403)
+        message = "Failed to delete the task"
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,
+                           update_form=update_form, delete_form=delete_form)
 
 
 @web_ui.route('/delete_all', methods=['POST'])
-@auth.login_required()
+@auth.login_required(role="admin")
 def delete_all():
     message = ""
     update_form = UpdateTodoForm()
     insert_form = InsertTodoForm()
     delete_form = DeleteTodoForm()
-    if auth.current_user() in roles["admin"]:
-        if request.method == 'POST':
-            models.delete_all()
-            message = "All the tasks have been delete successfully"
+    if request.method == 'POST':
+        models.delete_all()
+        message = "All the tasks have been delete successfully"
 
-        tasks = models.get_all_todos()
-        return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
-    else:
-        abort(403)
+    tasks = models.get_all_todos()
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
+
 
 @web_ui.route('/exportcsv', methods=["GET", "POST"])
 @auth.login_required()
@@ -241,58 +233,53 @@ def export_csv():
     update_form = UpdateTodoForm()
     insert_form = InsertTodoForm()
     delete_form = DeleteTodoForm()
-    if auth.current_user() in roles["admin"]:
-        export = services.export_to_csv()
-        if export == 0:
-            message = "Export successful. Data written to /db/db.csv"
-        else:
-            message = "No data to export !"
-        return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
+    export = services.export_to_csv()
+    if export == 0:
+        message = "Export successful. Data written to /db/db.csv"
     else:
-        abort(403)
+        message = "No data to export !"
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
 
 @web_ui.route('/importcsv', methods=["GET", "POST"])
-@auth.login_required()
+@auth.login_required(role="admin")
 def import_csv():
     # Get the list of tasks before import
     tasks_before_import = models.get_all_todos()
     update_form = UpdateTodoForm()
     insert_form = InsertTodoForm()
     delete_form = DeleteTodoForm()
-    if auth.current_user() in roles["admin"]:
-        # Check if a CSV file has been provided in the request
-        if 'csv_file' not in request.files:
-            message = "No CSV file provided."
-            return render_template("index.html", tasks=tasks_before_import, message=message, insert_form=insert_form,update_form=update_form, delete_form= delete_form)
 
-        csv_file = request.files['csv_file']
+    # Check if a CSV file has been provided in the request
+    if 'csv_file' not in request.files:
+        message = "No CSV file provided."
+        return render_template("index.html", tasks=tasks_before_import, message=message, insert_form=insert_form,update_form=update_form, delete_form= delete_form)
 
-        # Check if the file has a proper name and extension
-        if csv_file.filename == '' or not csv_file.filename.endswith('.csv'):
-            message = "Invalid CSV file."
-            return render_template("index.html", tasks=tasks_before_import, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
+    csv_file = request.files['csv_file']
 
-        # Call the import function with the CSV file
-        import_result = services.import_from_csv(csv_file)
+    # Check if the file has a proper name and extension
+    if csv_file.filename == '' or not csv_file.filename.endswith('.csv'):
+        message = "Invalid CSV file."
+        return render_template("index.html", tasks=tasks_before_import, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
 
-        # Get the list of tasks after import
-        tasks_after_import = models.get_all_todos()
+    # Call the import function with the CSV file
+    import_result = services.import_from_csv(csv_file)
 
-        if import_result == 0:
-            message = "Import successful."
-        elif import_result == 1:
-            message = "No data imported. The CSV file is empty."
-        elif import_result == 2:
-            message = "Error reading the CSV file."
-        else:
-            message = "An unspecified error occurred during import. (It's probably due to the date !)"
+    # Get the list of tasks after import
+    tasks_after_import = models.get_all_todos()
 
-        # Use the list of tasks before import if an error occurred
-        tasks = tasks_after_import if import_result == 0 else tasks_before_import
-
-        return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
+    if import_result == 0:
+        message = "Import successful."
+    elif import_result == 1:
+        message = "No data imported. The CSV file is empty."
+    elif import_result == 2:
+        message = "Error reading the CSV file."
     else:
-        abort(403)
+        message = "An unspecified error occurred during import. (It's probably due to the date !)"
+
+    # Use the list of tasks before import if an error occurred
+    tasks = tasks_after_import if import_result == 0 else tasks_before_import
+
+    return render_template("index.html", tasks=tasks, message=message, insert_form=insert_form,update_form=update_form, delete_form=delete_form)
 
 @web_ui.errorhandler(500)
 def handle_internal_error(error):
@@ -316,10 +303,16 @@ def verify_password(username, password):
 
 @auth.get_user_roles
 def get_user_roles(user):
-    return user.roles
+    if user in roles["admin"]:
+        return ["admin"]
+    elif user in roles["member"]:
+        return ["member"]
+    else:
+        return []
+
 
 @web_ui.route("/admin")
-@auth.login_required
+@auth.login_required(role="admin")
 def admin_view():
     if auth.current_user() in roles["admin"]:
         return f"Hello {auth.current_user()}, you are an admin!"
