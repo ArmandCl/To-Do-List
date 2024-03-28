@@ -21,19 +21,9 @@
     <input type="submit" name="add_task" value="Create task">
     </form>
 
-
-    <!-- Delete task form -->
-    <h2>Delete a task</h2>
-    <form method="post" action="/delete">
-      <label for="ID">ID :</label>
-      <input type="text" name="id" placeholder="Enter your task ID" id="ID_delete" required>
-      <br>
-      <input type="submit" name="delete_task" value="Delete task">
-    </form>
-
     <!-- Update task form -->
     <h2>Update a task</h2>
-    <form method="post" action="/update">
+    <form method="POST" action="/update">
         {{ update_form.csrf_token }}
         {{ update_form.ID_update  }}
         <br>
@@ -46,11 +36,17 @@
         {{ update_form.complete.label }}
         {{ update_form.complete(type="checkbox") }}
         <br>
-        <input type="submit" name="update_task" value="Update task">
+        <input type="submit" name="update_task" value="Update the selected task">
+    </form>
+    <!-- Delete task form -->
+    <form method="POST" action="/delete">
+        {{ delete_form.csrf_token }}
+        {{ delete_form.ID_delete }}
+        <input type="submit" name="delete_task" value="Delete the selected task">
     </form>
 
 
-    <form method="post" action="/delete_all">
+    <form method="POST" action="/delete_all">
         <input name="delete_all" type="submit" value="Delete all task">
     </form>
 
@@ -93,11 +89,11 @@
     </table>
 
 
-    <form method="post" action="/exportcsv">
+    <form method="POST" action="/exportcsv">
         <input name="export_csv" type="submit" value="Export to CSV">
     </form>
 
-    <form method="post" action="/importcsv" enctype="multipart/form-data">
+    <form method="POST" action="/importcsv" enctype="multipart/form-data">
         <input type="file" name="csv_file">
         <br>
         <br>
