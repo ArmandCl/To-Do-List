@@ -12,8 +12,10 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField
 from wtforms.validators import DataRequired
 
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPBasicAuth, HTTPTokenAuth
 from werkzeug.security import generate_password_hash,check_password_hash
+from flask_pydantic_spec import FlaskPydanticSpec, Request
+from pydantic import BaseModel, Field, constr
 
 import os
 
@@ -87,15 +89,11 @@ def create_user(username: str, password: str, role:str):
 def get_user(id: uuid.UUID):
     models.get_user(id)
 
-
-
-
-
-
-
-
 web_ui =Blueprint("web_ui",__name__, url_prefix="/")
-auth = HTTPBasicAuth()
+api=Blueprint("api_ui",__name__, url_prefix="/api")
+auth= HTTPBasicAuth()
+auth_token = HTTPTokenAuth(scheme='Bearer')
+api_spec = FlaskPydanticSpec('flask')
 
 users = {
     "armand": generate_password_hash("hello"),
@@ -122,10 +120,22 @@ class DeleteTodoForm(FlaskForm):
     ID_delete = StringField('ID_delete', validators=[DataRequired()], render_kw={'type': 'hidden'})
     submit = SubmitField('Submit')
 
+class Profile(BaseModel):
+    username: str
+    password: str
+    role: str
+
+tokens = {
+    "secret-token-1": "armand",
+    "secret-token-2": "admin"
+}
+
 def create_app():
     app = Flask(__name__)
+    api_spec.register(app)
     from toudou.views import web_ui
     app.register_blueprint(web_ui)
+    app.register_blueprint(api)
     app.secret_key = secret_key
 
     return app
@@ -318,3 +328,39 @@ def admin_view():
         return f"Hello {auth.current_user()}, you are an admin!"
     else:
         abort(403)
+
+"""
+#Probleme à résoudre plus tard
+@auth.error_handler
+def auth_error(status):
+    logging.exception(status)
+    return redirect(url_for(".accueil"))
+"""
+
+
+@api.route('/user', methods=['GET'])
+def get_user_profile():
+    # Récupérez les paramètres de requête
+    username = request.args.get('username')
+    password = request.args.get('password')
+    role = request.args.get('role')
+
+    if not username or not password or not role:
+        return {"error": "username, password, and role are required"}, 400
+
+    # Créez un nouvel objet Profile
+    profile = Profile(username=username, password=password, role=role)
+
+    # Vous pouvez effectuer ici toutes les opérations nécessaires avec le profil,
+    # comme la récupération des données à partir de la base de données.
+
+    # Retournez une réponse appropriée
+    return {"profile": profile.dict()}, 200
+
+
+
+
+@auth_token.verify_token
+def verify_token(token):
+    if token in tokens:
+        return tokens[token]

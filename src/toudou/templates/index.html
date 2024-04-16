@@ -45,11 +45,6 @@
         <input type="submit" name="delete_task" value="Delete the selected task">
     </form>
 
-
-    <form method="POST" action="/delete_all">
-        <input name="delete_all" type="submit" value="Delete all task">
-    </form>
-
 {% if message %}
     <p><strong>{{ message }}</strong></p>
 {% endif %}
@@ -89,16 +84,27 @@
     </table>
 
 
-    <form method="POST" action="/exportcsv">
-        <input name="export_csv" type="submit" value="Export to CSV">
-    </form>
+    <div class="line_button">
+        <form method="POST" action="/exportcsv">
+            <input name="export_csv" type="submit" value="Export to CSV">
+        </form>
 
-    <form method="POST" action="/importcsv" enctype="multipart/form-data">
-        <input type="file" name="csv_file">
-        <br>
-        <br>
-        <button type="submit">Import CSV</button>
-    </form>
+        <form method="POST" action="/importcsv" enctype="multipart/form-data">
+            <label class="file-input-label">
+                Choose File
+                <input type="file" name="csv_file">
+            </label>
+            <br>
+            <br>
+            <button type="submit" class="file-input-label">Import CSV</button>
+        </form>
+
+
+        <form method="POST" action="/delete_all">
+            <input name="delete_all" type="submit" value="Delete all the tasks">
+        </form>
+    </div>
+
 
 </div>
 <script src="../static/js/script.js"></script>
