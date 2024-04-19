@@ -8,9 +8,9 @@ from toudou import config
 from sqlalchemy import create_engine, MetaData, Table, Column, Uuid, Integer, String, Boolean, DateTime, engine, Engine, \
     inspect, select, insert, bindparam,delete
 
-TODO_FOLDER = config["TOUDOU_FOLDER"]
+TODO_FOLDER = "db"
 metadata = MetaData()
-engine = create_engine(config["DATABASE_URL"], echo=config["DEBUG"])
+engine = create_engine("sqlite:///db/todos.db", echo=True)
 
 todos_table = Table(
         "todos",

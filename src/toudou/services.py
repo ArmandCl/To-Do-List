@@ -12,7 +12,7 @@ from toudou import config
 def export_to_csv() -> int:
     # Utilise la méthode get_all_todos pour récupérer les tâches
     todos = get_all_todos()
-    filename = config["FILE_NAME_CSV"]
+    filename = "./db/db.csv"
     if todos:
         # Écrire les données dans un fichier CSV
         csv_columns = ["id", "task", "complete", "due"]

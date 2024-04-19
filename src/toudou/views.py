@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field, constr
 
 import os
 
-secret_key = os.getenv('TOUDOU_FLASK_SECRET_KEY')
+secret_key = "secret"
 
 @click.group()
 def cli():
