@@ -103,5 +103,12 @@ List of all libraries installed in PDM get with `pdm list`:
 ╰───────────────────┴──────────────┴──────────────────────────────────────────╯
 
 ```
-
-Course & examples : [https://kathode.neocities.org](https://kathode.neocities.org)
+### !!! Important things to note !!!
+- It used to be a `dev.env` file to store the environment variables, but it was removed because the command `pdm build` didn't work with it. I couldn't figure out why `pdm build` doesn't take the `dev.env` file. I tried a lot of different methods, but nothing worked, so I removed the file.
+- To connect yourself, you can use the following credentials:
+    - All the rights:  
+      - name : `admin`  
+      - password : `admin`
+    - Only the right of reading : 
+      - name :`armand`
+      - password : `armand`

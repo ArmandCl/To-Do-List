@@ -96,7 +96,7 @@ auth_token = HTTPTokenAuth(scheme='Bearer')
 api_spec = FlaskPydanticSpec('flask')
 
 users = {
-    "armand": generate_password_hash("hello"),
+    "armand": generate_password_hash("armand"),
     "admin": generate_password_hash("admin")
 }
 
@@ -328,35 +328,6 @@ def admin_view():
         return f"Hello {auth.current_user()}, you are an admin!"
     else:
         abort(403)
-
-"""
-#Probleme à résoudre plus tard
-@auth.error_handler
-def auth_error(status):
-    logging.exception(status)
-    return redirect(url_for(".accueil"))
-"""
-
-
-@api.route('/user', methods=['GET'])
-def get_user_profile():
-    # Récupérez les paramètres de requête
-    username = request.args.get('username')
-    password = request.args.get('password')
-    role = request.args.get('role')
-
-    if not username or not password or not role:
-        return {"error": "username, password, and role are required"}, 400
-
-    # Créez un nouvel objet Profile
-    profile = Profile(username=username, password=password, role=role)
-
-    # Vous pouvez effectuer ici toutes les opérations nécessaires avec le profil,
-    # comme la récupération des données à partir de la base de données.
-
-    # Retournez une réponse appropriée
-    return {"profile": profile.dict()}, 200
-
 
 
 

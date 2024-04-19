@@ -53,4 +53,4 @@ def import_from_csv(csv_file) -> int:
     except pd.errors.ParserError:
         return 2  # Erreur lors de la lecture du fichier CSV
     except Exception as e:
-        return 3  # Autre erreur non spécifiée
+        return 3  # Erreur inconnue
